@@ -3,6 +3,7 @@ require 'oystercard'
 describe Oystercard do
     before(:each) do
         @entry_station = double("station")
+        @exit_station = double("station")
     end
 
     describe '#initialize' do
@@ -38,7 +39,7 @@ describe Oystercard do
       it "card touch in, card status changed to in use" do
         subject.top_up(Oystercard::MINIMUM_BALANCE)
         subject.touch_in(@entry_station)
-        expect(subject.state).to eq true
+        expect(subject.in_journey?).to eq true
       end
 
       it "store entry station when touch in" do
@@ -50,22 +51,27 @@ describe Oystercard do
       it "raises an exception when user tries to touch in with less than £1 balance" do
         expect {subject.touch_in(@entry_station)}.to raise_error "minimum balance"
       end
-      
+
     end
 
     describe '#touch_out' do
-    
-      it "card touch out, card status not in use" do 
-        subject.top_up(Oystercard::MINIMUM_BALANCE)    
-        expect(subject.touch_out).to eq false
+
+      it "card touch out, card status not in use" do
+        subject.top_up(Oystercard::MINIMUM_BALANCE)
+        expect(subject.in_journey?).to eq false
       end
 
       it "charging the minimum fare on touch out" do
-        expect {subject.touch_out}.to change{subject.balance}.by(-1)
+        expect {subject.touch_out(@exit_station)}.to change{subject.balance}.by(-1)
+      end
+
+      it "accepts an exit station" do
+        subject.touch_out(@exit_station)
+        expect(subject.exit_station).to eq(@exit_station)
       end
 
     end
- 
+
     describe "#in_journey" do
 
       it "card touches in and we are in journey" do
@@ -75,11 +81,10 @@ describe Oystercard do
       end
 
       it "card touches out and we are in journey" do
-        subject.touch_out
+        subject.touch_out(@exit_station)
         expect(subject.in_journey?).to be false
       end
 
     end
 
 end
-
