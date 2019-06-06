@@ -11,6 +11,12 @@ describe Oystercard do
         oystercard = Oystercard.new
         expect(subject.balance).to eq(0)
       end
+
+      it "has a empty list of journeys by default" do
+        oystercard = Oystercard.new
+        expect(subject.list_of_journeys).to eq([])
+      end
+
     end
 
     describe '#top_up' do
@@ -95,6 +101,14 @@ describe Oystercard do
         subject.touch_out(@exit_station)
         expect{subject.journey_log}.to output("#{@entry_station} to #{@exit_station}").to_stdout
       end
+
+      it "touching in and out creates one journey" do
+        subject.top_up(Oystercard::MINIMUM_BALANCE)
+        subject.touch_in(@entry_station)
+        subject.touch_out(@exit_station)
+        expect(subject.journey_log.length).to eq(1)
+      end
+      
     end
 
 end
