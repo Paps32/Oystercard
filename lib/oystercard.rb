@@ -7,6 +7,8 @@ class Oystercard
 
     def initialize
       @balance = 0
+      @journey = {}
+      @list_of_journeys = []
     end
 
     def top_up(amount)
@@ -17,6 +19,7 @@ class Oystercard
     def touch_in(station)
       raise "minimum balance" if @balance < MINIMUM_BALANCE
       @entry_station = station
+      @journey["entry station"] = @entry_station
       return station
     end
 
@@ -24,10 +27,18 @@ class Oystercard
       deduct(MINIMUM_BALANCE)
       @entry_station = nil
       @exit_station = exit_station
+      @journey["exit station"] = @exit_station
     end
 
     def in_journey?
       !@entry_station.nil?
+    end
+
+    def journey_log
+      @list_of_journeys << @journey
+      @list_of_journeys.each do |index|
+       print "#{index["entry station"]} to #{index["exit station"]}"
+      end
     end
 
   private

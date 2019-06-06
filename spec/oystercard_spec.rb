@@ -87,4 +87,14 @@ describe Oystercard do
 
     end
 
+    describe '#journey_log' do
+
+      it "tells you your previous journeys" do
+        subject.top_up(Oystercard::MINIMUM_BALANCE)
+        subject.touch_in(@entry_station)
+        subject.touch_out(@exit_station)
+        expect{subject.journey_log}.to output("#{@entry_station} to #{@exit_station}").to_stdout
+      end
+    end
+
 end
